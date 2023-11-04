@@ -224,4 +224,41 @@ class Updateproperty(generics.RetrieveUpdateDestroyAPIView):
     queryset=RoomProperty.objects.all()
     serializer_class=PropertySerializer
 
+
+# class Getpropertybylocation(generics.RetrieveAPIView):
+#    serializer_class = PropertySerializer
+
+#    def get_queryset(self):
+        
+#         maplocation = self.request.query_params.get('maplocation', '')
+       
+#         queryset = RoomProperty.objects.all()
+
+#         if maplocation:
+#             queryset = queryset.filter(maplocation=maplocation)
+
+       
+
+#         return queryset
+
+
+class Getpropertybylocation(generics.ListAPIView):
+    queryset = RoomProperty.objects.all()
+    serializer_class = PropertySerializer
+
+    def get_queryset(self):
+        maplocation = self.kwargs.get('location', '')  
+        print("maplocn", maplocation)
+       
+        queryset = RoomProperty.objects.all()
+
+        if maplocation:
+            queryset = queryset.filter(maplocation=maplocation)
+            
+            print("queryset", queryset)
+            
+
+        return queryset
+
+
         
