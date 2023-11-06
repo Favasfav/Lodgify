@@ -10,6 +10,7 @@ from django.core import serializers
 from .models import RoomProperty
 import json
 from rest_framework.generics import RetrieveAPIView
+from django.db.models import Q
 
 class Addproperty(APIView):
    
@@ -109,18 +110,7 @@ class Verifyproperty(APIView):
         return Response({"message": "Property verified successfully"}, status=status.HTTP_201_CREATED)
 
 
-# class Propertyview(APIView):
-#     def get(self, request, property_id):
-#         try:
-#             data = RoomProperty.objects.get(id=property_id)
-#             serialized_properties = serializers.serialize("json", [data])
-#             parsed_data = json.loads(serialized_properties)
-#             return JsonResponse({"room_property": parsed_data[0]['fields']})
-            
-#         except RoomProperty.DoesNotExist:
-#             return JsonResponse({"error": "Room property not found"}, status=404)
-            
-#         # return Response({"error":""}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Propertyview(RetrieveAPIView):
     queryset = RoomProperty.objects.all()
@@ -133,11 +123,6 @@ class Propertyview(RetrieveAPIView):
 
         
         return RoomProperty.objects.get(id=property_id)
-
-
-    
-
-
 
 
 class PropertyListView(APIView):
@@ -171,94 +156,51 @@ class PartnerProperty(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class Updateproperty(APIView):
-#     def post(self,request,property_id):
-#         print("hloo")
-#         data = request.data
-#         print("data", data)
-#         serializer=PropertySerializer(data=data)
-#         # if serializer.is_valid():
-#         #     try:
-#         #         property=RoomProperty.objects.get(id=property_id)
-#         #         print("hkjkj")
-#         #         property(
-#         #         property_type=data.get("property_type"),
-#         #         property_name=data.get("property_name"),
-#         #         total_rooms=data.get("total_rooms"),
-#         #         single_room_price=data.get("single_room_price"),
-#         #         adults_price=data.get("adults_price"),
-#         #         total_room_price=data.get("total_room_price"),
-#         #         capacity=data.get("capacity"),
-#         #         property_address=data.get("property_address"),
-#         #         city=data.get("city"),
-#         #         state=data.get("state"),
-#         #         zip_code=data.get("zip_code"),
-#         #         parking=data.get("parking"),
-#         #         swimming_pool=data.get("swimming_pool"),
-#         #         room_description=data.get("room_description"),
-#         #         maplocation=data.get("maplocation"),
-#         #         country=data.get("country"),
-#         #         is_verified=False,  # Set to False by default
-#         #         partner=partner,
 
-#         #          ) .save() 
-
-#         #         photos=data.getlist("photos")
-#         #         for photo in photos:
-#         #             photo_list=RoomPhoto(photo=photo,room_property=room_property)    
-#         #             photo_list.save()  
-#         #         amenities=data.getlist("amenities")
-#         #         for aminity in amenities:
-#         #             amenities_list=RoomAmenity(amenities=amenities,room_property=room_property)
-#         #             amenities_list.save()
-                  
-
-
-
-#         #     except Exception as e:
-#         #         return response({"error": str(e)},status=status.HTTP_400_BAD_REQUEST)     
-               
-    
 
 class Updateproperty(generics.RetrieveUpdateDestroyAPIView):
     queryset=RoomProperty.objects.all()
     serializer_class=PropertySerializer
 
 
-# class Getpropertybylocation(generics.RetrieveAPIView):
-#    serializer_class = PropertySerializer
-
-#    def get_queryset(self):
-        
-#         maplocation = self.request.query_params.get('maplocation', '')
-       
-#         queryset = RoomProperty.objects.all()
-
-#         if maplocation:
-#             queryset = queryset.filter(maplocation=maplocation)
-
-       
-
-#         return queryset
 
 
-class Getpropertybylocation(generics.ListAPIView):
-    queryset = RoomProperty.objects.all()
-    serializer_class = PropertySerializer
+class Getpropertybylocation(APIView):
+    def get(self, request, *args, **kwargs):
+        maplocation = self.kwargs.get('location', '')
+        category = request.query_params.getlist('category', [])
+        amenities = request.query_params.getlist('Amenities', [])
+        property_type = request.query_params.getlist('Property_Type', [])
 
-    def get_queryset(self):
-        maplocation = self.kwargs.get('location', '')  
-        print("maplocn", maplocation)
-       
         queryset = RoomProperty.objects.all()
 
         if maplocation:
             queryset = queryset.filter(maplocation=maplocation)
-            
-            print("queryset", queryset)
-            
 
-        return queryset
+        if category:
+            # Use Q objects to handle multiple values for 'category'
+            category_query = Q()
+            for c in category:
+                category_query |= Q(category__category=c)
+            queryset = queryset.filter(category_query)
+
+        if amenities:
+            # Use Q objects to handle multiple values for 'amenities'
+            amenities_query = Q()
+            for a in amenities:
+                amenities_query |= Q(amenities__amenities=a)
+            queryset = queryset.filter(amenities_query)
+
+        if property_type:
+            # Use Q objects to handle multiple values for 'property_type'
+            property_type_query = Q()
+            for p in property_type:
+                property_type_query |= Q(property_type=p)
+            queryset = queryset.filter(property_type_query)
+        print("ffffffffffff",queryset)
+        serializer = PropertySerializer(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
         
