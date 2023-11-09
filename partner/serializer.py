@@ -2,9 +2,9 @@
 from rest_framework import serializers
 
 from rest_framework.serializers import ModelSerializer, ValidationError, ImageField
-from partner.models import *
-from accounts.api.serializers import PartnerModelSerializer
 
+from accounts.api.serializers import PartnerModelSerializer
+from partner.models import *
 
 
 class RoomPhotoSerializer(serializers.ModelSerializer):

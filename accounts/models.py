@@ -31,7 +31,7 @@ class UserProfile(models.Model):
     
 
     def _str_(self):
-        return self.user.email 
+        return self.user 
     
 
 class PartnerProfile(models.Model):
@@ -40,7 +40,7 @@ class PartnerProfile(models.Model):
      
 
      def _str_(self):
-        return self.user.email
+        return self.user
      
 
 class AdminProfile(models.Model):
