@@ -11,7 +11,7 @@ from .models import RoomProperty
 import json
 from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q
-
+from booking.models import *
 class Addproperty(APIView):
    
     def post(self, request):
@@ -173,26 +173,27 @@ class Getpropertybylocation(APIView):
         property_type = request.query_params.getlist('Property_Type', [])
 
         queryset = RoomProperty.objects.all()
+        
 
         if maplocation:
             queryset = queryset.filter(maplocation=maplocation)
 
         if category:
-            # Use Q objects to handle multiple values for 'category'
+           
             category_query = Q()
             for c in category:
                 category_query |= Q(category__category=c)
             queryset = queryset.filter(category_query)
 
         if amenities:
-            # Use Q objects to handle multiple values for 'amenities'
+            
             amenities_query = Q()
             for a in amenities:
                 amenities_query |= Q(amenities__amenities=a)
             queryset = queryset.filter(amenities_query)
 
         if property_type:
-            # Use Q objects to handle multiple values for 'property_type'
+           
             property_type_query = Q()
             for p in property_type:
                 property_type_query |= Q(property_type=p)
@@ -203,4 +204,11 @@ class Getpropertybylocation(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-        
+
+
+
+
+    # room = models.ForeignKey(RoomProperty,related_name='room_bookings', on_delete=models.CASCADE)
+    # user = models.ForeignKey(UserProfile,related_name='user_bookings',on_delete=models.CASCADE)
+    # check_in_date = models.DateField()
+    # check_out_date = models.DateField()

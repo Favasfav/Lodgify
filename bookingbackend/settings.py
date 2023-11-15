@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from decouple import config
+from dotenv import load_dotenv
+# from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -219,3 +220,5 @@ AWS_S3_ACCESS_KEY_ID = 'AKIARPGBAO3WNMLBOEPG'
 AWS_S3_SECRET_ACCESS_KEY = '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'
 AWS_STORAGE_BUCKET_NAME = 'lodgifyproject'
 AWS_QUERYSTRING_AUTH = False
+RAZORPAY_KEY_ID=os.environ.get('RAZORPAY_KEY_ID')
+RAZORPAY_SECRET_KEY=os.environ.get('RAZORPAY_SECRET_KEY')

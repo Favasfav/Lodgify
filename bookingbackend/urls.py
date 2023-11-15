@@ -8,10 +8,10 @@ from django.conf.urls.static import static
 urlpatterns = [
      path('api/', include('accounts.api.urls')),
      path('admin/', admin.site.urls),
-      path('partner/', include('partner.urls')),
-       path('booking/', include('booking.urls')),
-        path('chat/', include('chat.urls')),
-     
+     path('partner/', include('partner.urls')),
+     path('booking/', include('booking.urls')),
+     path('chat/', include('chat.urls')),
+     path('apirazorpay/', include('booking.apirazorpay.urls')),
 
 
 ]
