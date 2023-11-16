@@ -23,7 +23,7 @@ urlpatterns=[
      path('profileupdate/<int:user_id>/', views.profileupdate, name='profileupdate'),
      path('userprofile/<int:user_id>/', views.userprofile, name='userprofile'),
      path('Partnerprofile/<int:user_id>/', views.Partnerprofile, name='Partnerprofile'),
-  # path('otpverify/<int:otp>/', otpverifyAPI.as_view(), name='otpverify'),
+      path('wallet/<int:user_id>/', Walletmoney.as_view(), name='wallet'),
     
     
     ]

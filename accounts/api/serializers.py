@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, ValidationError, ImageField
 # from base.models import Note
 # from django.contrib.auth.models import User
-from accounts.models import UserProfile,PartnerProfile,CustomUser
+from accounts.models import UserProfile,PartnerProfile,CustomUser,Wallet
 
 from partner.models import RoomProperty,RoomCategory, RoomAmenity, RoomPhoto
 
@@ -34,14 +34,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
-        depth=1
+        depth=2
        
 
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = '__all__'  # Use '*' to include all fields from the model
-        depth = 1
+        depth = 2
 
 class PartnerModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,3 +55,7 @@ class profileupdateSerializer(serializers.ModelSerializer):
         fields = '__all__'  # Use '*' to include all fields from the model
         depth = 1        
 
+class WalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
+        fields = ['balance']

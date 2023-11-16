@@ -12,6 +12,8 @@ class Booking(models.Model):
     check_out_date = models.DateField()
     room_qty_booked = models.PositiveIntegerField(default=1,blank=True,null=True)  
     total_amount=models.PositiveIntegerField(blank=True,null=True)
+    is_cancelled=models.BooleanField(default=False)
+    
     class Meta:
         constraints = [
             models.CheckConstraint(

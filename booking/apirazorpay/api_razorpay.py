@@ -2,11 +2,11 @@ from rest_framework.views import APIView
 from rest_framework import status
 from booking.apirazorpay.razorpay_serializer import CreateOrderSerializer,TranscationModelSerializer,TransactioncharcheckSerializer
 from rest_framework.response import Response
-from booking.views import Roombooking
+
 from booking.models import *
 from booking.apirazorpay.razorpay.main import RazorpayClient
 rz_client=RazorpayClient()
-booking_obj=Roombooking()
+
 class CreateOrderAPIView(APIView):
     def post(self,request,*args,**kwargs):
         property_id = self.kwargs.get('propertyId')

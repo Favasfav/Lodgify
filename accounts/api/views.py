@@ -5,9 +5,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view 
-from accounts.api.serializers import SignupSerializer,LoginSerializer,UserModelSerializer,profileupdateSerializer,CustomUserSerializer,PartnerModelSerializer
+from accounts.api.serializers import SignupSerializer,LoginSerializer,UserModelSerializer,profileupdateSerializer,CustomUserSerializer,PartnerModelSerializer,WalletSerializer
 from rest_framework import status
-from accounts.models import UserProfile,PartnerProfile,CustomUser
+from accounts.models import UserProfile,PartnerProfile,CustomUser,Wallet
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -384,3 +384,12 @@ def Partnerprofile(request, user_id):
         
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class Walletmoney(APIView):
+    def get(self,request,*args,**kwargs):
+        user_id=self.kwargs.get('user_id')
+        user = CustomUser.objects.get(id=user_id)
+        user_profile=UserProfile.objects.get(user=user)
+        
+        wallet = Wallet.objects.get(user=user_profile)
+        serializer = WalletSerializer(wallet)
+        return Response(serializer.data)
