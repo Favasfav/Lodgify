@@ -45,8 +45,8 @@ class UserLoginView(APIView):
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    # 'username':user.username,
-                    # 'phone_no':user.phone_no,
+                    'username':user.username,
+                    'role':user.role,
                     # 'profile_photo':profile_photo,
                 }
                 print("Serialized Data:", data)
@@ -72,7 +72,7 @@ class PartnerLoginView(APIView):
                 password = serializer.data['password']
                 
                 user = authenticate(email=email, password=password)
-                print("user",user)
+                print("user===============================",user)
                 if user is None or user.role != 'partner' :
                     data = {
                         'message': 'invalid credentials',
@@ -87,6 +87,7 @@ class PartnerLoginView(APIView):
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
+                    'role':user.role
                     
                 }
                 return Response(data, status=status.HTTP_200_OK)
@@ -127,7 +128,7 @@ class AdminLoginView(APIView):
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    
+                    'role':user.role
                 }
                 return Response(data, status=status.HTTP_200_OK)
             
@@ -140,46 +141,7 @@ class AdminLoginView(APIView):
         except Exception as e:
             print(e)
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-
-#         # Add custom claims
-#         token['username'] = user.username
-#         token['is_superuser'] = user.is_superuser
-
-#         return token
-
-#     def validate(self, attrs):
-#         email = attrs.get('email')
-#         password = attrs.get('password')
-
-#         # Try to find the user in UserProfile
-#         try:
-#             user = UserProfile.objects.get(email=email)
-#         except UserProfile.DoesNotExist:
-#             user = None
-
-#         # If the user doesn't exist in UserProfile, try finding in PartnerProfile
-#         if not user:
-#             try:
-#                 user = PartnerProfile.objects.get(email=email)
-#             except PartnerProfile.DoesNotExist:
-#                 raise serializers.ValidationError("User with this email does not exist.")
-
-#         if not user.check_password(password):
-#             raise serializers.ValidationError("Invalid password.")
-
-#         # Continue with token generation
-#         data = super().validate(attrs)
-#         refresh = self.get_token(user)
-#         data['refresh'] = str(refresh)
-#         data['access'] = str(refresh.access_token)
-
-#         return data
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class=MyTokenObtainPairSerializer  
+ 
 @api_view(['GET'])
 def getRoutes(request):
     routes=[
@@ -189,49 +151,7 @@ def getRoutes(request):
     return Response(routes)
 
 
-# class UserLoginView(APIView):
-#      def post(self, request):
-#         data = request.data
-#         if 'email' not in data or 'password' not in data:
-           
-#             return Response({'error': 'Both email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-#         email = data['email']
-#         password = data['password']
-#         user = UserProfile.objects.filter(email=email).first()
-
-#         if not user:
-#             raise AuthenticationFailed('User not found!')
-
-#         if not user.check_password(password):
-#             raise AuthenticationFailed('Incorrect password!')
-        
-#         # if not user.is_superuser:
-#         #     raise AuthenticationFailed('Access denied!')
-        
-        
-#         payload = {
-#             'id': user.id,
-#             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-#             'iat': datetime.datetime.utcnow(),
-#             'is_superuser':is_superuser
-#         }
-        
-#         tocken = jwt.encode(payload, 'secret', algorithm ='HS256')
-#         responce = Response()
-        
-        
-        
-#         responce.data = {
-#                 'jwt': tocken
-#             }
-        
-#         return responce
-
-# class otpverifyAPI(APIView):
-#     def post(self,request,pin):
-#         pass
-    
 
 
 
@@ -241,13 +161,10 @@ class UserSignupAPI(APIView):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             user_data = serializer.validated_data
-            # user = serializer.save()
+           
             print(user_data,"ser_data")
             user = CustomUser(
-                
-                
                 email = 'user-' + user_data['email'],
-                
                 
                 role = 'user',
                 phone_no = 'user-' + user_data['phone_no'],
@@ -389,7 +306,7 @@ class Walletmoney(APIView):
         user_id=self.kwargs.get('user_id')
         user = CustomUser.objects.get(id=user_id)
         user_profile=UserProfile.objects.get(user=user)
-        
+
         wallet = Wallet.objects.get(user=user_profile)
         serializer = WalletSerializer(wallet)
         return Response(serializer.data)
