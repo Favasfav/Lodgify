@@ -10,10 +10,10 @@ urlpatterns = [
      path('admin/', admin.site.urls),
      path('partner/', include('partner.urls')),
      path('booking/', include('booking.urls')),
-     path('chat/', include('chat.urls')),
+     path('chats/', include('chats.urls')),
      path('apirazorpay/', include('booking.apirazorpay.urls')),
-
-
+    path("chat/", include("chats.urls")),
+  
 ]
 
 if settings.DEBUG:

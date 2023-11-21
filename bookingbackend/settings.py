@@ -42,6 +42,8 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +58,8 @@ INSTALLED_APPS = [
      'partner',
      'booking',
      'chat',
+     'channels',
+     'chats',
      
 ]
 
@@ -89,11 +93,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'bookingbackend.wsgi.application'
+# WSGI_APPLICATION = 'bookingbackend.wsgi.application'
+ASGI_APPLICATION = 'bookingbackend.asgi.application'
+
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # The domain of your frontend application
 ]
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",

@@ -14,6 +14,7 @@ class CreateOrderAPIView(APIView):
         check_out_date = self.kwargs.get('checkoutdate').strip()
         room_qty=self.kwargs.get('roomqty')
         user_id=self.kwargs.get('user_id')
+        checkin=check_in_date.split('-')
         
         print("hhhhhhhhhh",request.data)
         
@@ -48,7 +49,7 @@ class CreateOrderAPIView(APIView):
                         print(request.data,"hhhjh")
 
                         if create_order_serializer.is_valid():
-                            amount = create_order_serializer.validated_data.get("amount")
+                            amount = (create_order_serializer.validated_data.get("amount"))*-1
                             currency = create_order_serializer.validated_data.get("currency")
                             print("jjhjj", currency, amount)
                             order_response = rz_client.create_order(
@@ -96,6 +97,8 @@ class CreateOrderAPIView(APIView):
 
 class TranscationAPIView(APIView):
     def post(self,request,*args,**kwargs):
+        checkin=[]
+        checkout=[]
         property_id = self.kwargs.get('propertyId')
         check_in_date = self.kwargs.get('checkindate').strip()
         check_out_date = self.kwargs.get('checkoutdate').strip()
@@ -104,23 +107,12 @@ class TranscationAPIView(APIView):
         property = RoomProperty.objects.get(id=property_id)
         customuser_obj=CustomUser.objects.get(id=user_id)
         user=UserProfile.objects.get(user=customuser_obj)
-        # transaction_serializer=TranscationModelSerializer(
-        #     data=request.data
-        # )
-       
-        # if transaction_serializer.is_valid():
-        #     print(request.data)
-        #     rz_client.verify_payment(
-        #     razorpay_order_id=transaction_serializer.validated_data.get("order_id"),
-        #     razorpay_payment_id=transaction_serializer.validated_data.get("payment_id"),
-        #     razorpay_signature=transaction_serializer.validated_data.get("signature")
-        #     )
-        #     transaction_serializer.save()
-        #     response={
-        #         "status_code":status.HTTP_201_CREATED,
-        #         "message":"transaction created"
-        #     }
-
+        checkin=check_in_date.split('-')
+        print(checkin[2])
+        checkout=check_out_date.split('-')
+        print(checkout[2])
+        no_ofdays=int(checkout[2])-int(checkin[2])+1
+        print("no_ofdays",no_ofdays)
         data=request.data
         print("data",data)
         razorpay_order_id=data.get("order_id")
@@ -149,7 +141,8 @@ class TranscationAPIView(APIView):
             )
             if is_status:
                             print("hloo")
-                            total_amount=property.single_room_price*room_qty
+
+                            total_amount=property.single_room_price*room_qty*no_ofdays
                             bookingobj=Booking(
                                     room=property,
                                     user=user,
