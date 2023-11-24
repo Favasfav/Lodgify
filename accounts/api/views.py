@@ -87,7 +87,8 @@ class PartnerLoginView(APIView):
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    'role':user.role
+                    'role':user.role,
+                    'username':user.username,
                     
                 }
                 return Response(data, status=status.HTTP_200_OK)

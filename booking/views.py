@@ -189,3 +189,51 @@ class Totalrevenue(APIView):
         if total_amount_sum:
             return Response(total_amount_sum,status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)    
+
+
+
+
+
+class GetpartnerRevenue(APIView):
+    def get(self, request, *args, **kwargs):
+        partner_id = self.kwargs.get('partner_id')
+        
+        # Use get_object_or_404 to handle the case where PartnerProfile is not found
+        partner_obj = get_object_or_404(PartnerProfile, id=partner_id)
+        
+        transaction_obj = Transcation.objects.filter(partner=partner_obj)
+        
+        partner_revenue = transaction_obj.aggregate(Sum("partner_share", default=0))
+        
+        print(partner_revenue, "pppppppppppppppp")
+        
+        # Access the specific field from the aggregation result
+        partner_revenue_sum = partner_revenue.get('partner_share__sum', 0)
+        print(partner_revenue_sum, "ppppppp--------ppppppppp")
+        if partner_revenue_sum:
+            # You can use partner_revenue_sum in your code as needed
+            # For example, you can include it in the response data
+            response_data =  partner_revenue_sum
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+      
+class Bookinglatest(APIView):
+    def get(self,request, *args, **kwargs):
+        booking=Booking.objects.all().order_by('-id')[:5]
+        data=booking
+        print("booking",booking)
+        serializer=BookingSerializer(instance=booking,many=True)
+        if serializer:
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)  
+
+class Bookingtotalno(APIView):
+    def get(self,request, *args, **kwargs):
+        booking_no=len(Booking.objects.all())
+        
+        print("booking_nooo",booking_no)
+        
+        if booking_no:
+            return Response(booking_no,status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)        

@@ -31,4 +31,4 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomProperty
         fields = '__all__'
-        # depth=2
+        depth=2

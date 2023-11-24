@@ -71,17 +71,15 @@ from .serializers import *
 from accounts.models import *
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 class ChatConsumer(AsyncWebsocketConsumer):
-    print('------------------...,,,,..')
+   
     async def connect(self):
-        print('ldkfnsldfknsd;ofnsd;fonds;fn;f')
-        # current_user = self.scope["query_string"]
+       
+       
         current_user = int(self.scope["query_string"])
         other_user_id = self.scope["url_route"]["kwargs"]["user_id"]
        
         print(current_user,other_user_id,'------------------...,,,,..')
 
-        # current_user = int(self.scope["query_string"].decode("utf-8"))
-        # other_user_id = self.scope["url_route"]["kwargs"]["id"]
         self.room_name = (
             f"{current_user}_{other_user_id}"
             if int(current_user) > int(other_user_id)
@@ -90,7 +88,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
      
         self.room_group_name = f"chat_{self.room_name}"
         print("-----------------",self.room_group_name,"--------room",self.channel_name)
-        # Join room group
+        
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -111,14 +109,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         print(data,"data-----------")
         message = data['message']
+     
         sender_id = data['sender']
         # Save the message to the database
         receiver_id = data['receiver']
         
-        reciever_obj=  PartnerProfile.objects.get(id=receiver_id)
+        try:
+              reciever_obj = CustomUser.objects.get(id=receiver_id)
+        except CustomUser.DoesNotExist:
+             reciever_obj = None
         print("reciever-=-----============",reciever_obj)
-        print(reciever_obj.user)
-        receiver  = reciever_obj.user
+        
+        receiver  = reciever_obj
         print("reciever-=-----=hhhhh===========",receiver)
         sender = await self.get_user(sender_id)
         print("dender",sender)
