@@ -19,7 +19,8 @@ class Chatlist(APIView):
         user=CustomUser.objects.get(id=user_id)
         print("user",user)
         try :
-                messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('receiver', '-timestamp').distinct('receiver')
+                messages = Message.objects.filter(Q(sender=user) | Q(receiver=user)).order_by('thread_name','-timestamp').distinct('thread_name')
+              
                 print("messages",messages)
                 serializer=MessageSerializer(instance=messages,many=True)
 

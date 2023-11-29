@@ -22,6 +22,10 @@ class Booking(models.Model):
             )
         ]
 
+    def __str__(self):
+        return f"Booking ID: {self.id}"
+   
+
 # class Payment(models.Model):
 #     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
 #     payment_method = models.CharField(max_length=50)

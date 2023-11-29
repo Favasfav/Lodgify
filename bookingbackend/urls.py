@@ -13,6 +13,8 @@ urlpatterns = [
      path('chats/', include('chats.urls')),
      path('apirazorpay/', include('booking.apirazorpay.urls')),
     path("chat/", include("chats.urls")),
+    path("accounts/", include("accounts.urls")),
+    
   
 ]
 

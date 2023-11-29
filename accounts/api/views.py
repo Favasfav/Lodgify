@@ -28,20 +28,20 @@ class UserLoginView(APIView):
                 user = authenticate(email=email, password=password)
                 
                 if user is None or user.role != 'user' or user.is_blocked:
-                    data = {
+                    return Response({
+                        'status': 400,
                         'message': 'Invalid credentials or user is blocked.',
-                    }
-                    print("data",data)
-                    return Response(data, status=status.HTTP_400_BAD_REQUEST) 
-                
+                    }, status=status.HTTP_400_BAD_REQUEST) 
+                     
+                print("user.role00000",user.role)
                 refresh = RefreshToken.for_user(user)
-                # refresh['role'] = user.role
-                # refresh['email'] = user.email
-                # refresh['username'] = user.username
+                refresh['role'] = user.role
+                refresh['email'] = user.email
+                refresh['username'] = user.username
                 # refresh['phone_no'] = user.phone_no
                 # refresh['profile_photo'] = user.profile_photo
                 # refresh['is_superuser'] = user.is_superuser
-                
+                 
                 data = {
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
@@ -60,6 +60,10 @@ class UserLoginView(APIView):
 
         except Exception as e:
             print(e)
+            return Response({
+                'status': 500,
+                'message': 'Internal Server Error',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PartnerLoginView(APIView):
     def post(self, request):

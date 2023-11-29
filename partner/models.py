@@ -77,3 +77,10 @@ class RoomAmenity(models.Model):
         return self.amenities
     
 
+class Blockbooking(models.Model):
+    starting_date= models.DateField()
+    end_date=models.DateField()
+    property=models.ForeignKey(RoomProperty,related_name='room_bloking', on_delete=models.CASCADE)
+    def __str__(self):
+        return f"Blockbooking for {self.property} from {self.starting_date} to {self.end_date}"
+    

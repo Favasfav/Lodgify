@@ -11,5 +11,6 @@ urlpatterns=[
      path('updateproperty/<int:pk>/', Updateproperty.as_view(), name='updateproperty'), 
      path('getpropertybylocation/<str:location>/', Getpropertybylocation.as_view(), name='getpropertybylocation'), 
      
+     
     
 ]

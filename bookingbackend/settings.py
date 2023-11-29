@@ -40,10 +40,18 @@ REST_FRAMEWORK = {
 }
 
 # Application definition
+CELERY_BROKER_URL='redis://127.0.0.1:6379' 
+CELERY_ACCEPT_CONTENT=['application/json']
+CELERY_RESULT_SERIALIZER='json'
+CELERY_TASK_SERIALIZER='json'
+CELERY_TIMEZONE='Asia/Kolkata'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 
+
+
+CELERY_RESULT_BACKEND='django-db'
 INSTALLED_APPS = [
     "daphne",
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,7 +68,9 @@ INSTALLED_APPS = [
      'chat',
      'channels',
      'chats',
-     
+     'celery',
+     'django_celery_results',
+     'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -165,8 +175,8 @@ DATABASES = {
         'NAME': 'booking',
         'USER': 'postgres',
         'PASSWORD': 'Favas@9142',
-        'HOST': '',  # Use an empty string for the local machine
-        'PORT': '5432',  # Replace with the actual port number (e.g., 5432)
+        'HOST': '',  
+        'PORT': '5432', 
     }
 }
 

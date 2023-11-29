@@ -4,6 +4,7 @@ from booking.models import *
 class CreateOrderSerializer(serializers.Serializer):
     amount=serializers.IntegerField()
     currency=serializers.CharField()
+    
 
 class TranscationModelSerializer(serializers.ModelSerializer):
     class Meta:
