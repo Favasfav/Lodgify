@@ -14,10 +14,12 @@ import json
 from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q
 from accounts.models import *
-
+from rest_framework.decorators import permission_classes
+from accounts.permissions import *
 from datetime import datetime
-
+from rest_framework.permissions import IsAuthenticated
 class Checkroomavailblity(APIView):
+    permission_classes=[IsAuthenticated,Userpermission]
     def post(self, request, *args, **kwargs):
         property_id = self.kwargs.get('propertyId')
         check_in_date_str = self.kwargs.get('checkindate').strip()
@@ -63,20 +65,24 @@ class Checkroomavailblity(APIView):
             return Response({"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class Bookinglist(APIView):
+    
+    permission_classes=[IsAuthenticated,Userpermission]
     def get(self,request,*args,**kwargs):
-        print("haii")
+        print(request)
+        print("Headers:", request.headers)
+        print("Token:", request.headers.get('Authorization'))
+
         user_id=self.kwargs.get('user_id')
         print("user_id--------------",user_id)
         custom_obj=CustomUser.objects.get(id=user_id)
         user=UserProfile.objects.get(user=custom_obj)
         print("user",user)
         bookings=Booking.objects.filter(user=user)
-        print("bookings",bookings)
+        
         serializer=BookingSerializer(instance=bookings,many=True)   
         data=serializer.data
-        print("hlllllllll",data)
+      
         return Response(data,status=status.HTTP_200_OK)
 
 
@@ -95,7 +101,7 @@ class Bookinglistlatest(APIView):
             return Response(data,status=status.HTTP_200_OK)
         return Response(status=HTTP_400_BAD_REQUEST)    
 
-       
+permission_classes=[IsAuthenticated,Userpermission]       
 class CancelOrder(APIView):
     def post(self, request, *args, **kwargs):
         print(request.data)
@@ -118,10 +124,11 @@ class CancelOrder(APIView):
 
 
 class Bookingall(APIView):
+    permission_classes=[IsAuthenticated,AdminPermission]
     def get(self,request, *args, **kwargs):
         booking=Booking.objects.all()
         data=booking
-        print("booking",booking)
+        
         serializer=BookingSerializer(instance=booking,many=True)
         if serializer:
             return Response(serializer.data,status=status.HTTP_200_OK)

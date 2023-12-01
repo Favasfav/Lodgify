@@ -10,6 +10,7 @@ rz_client=RazorpayClient()
 from datetime import datetime
 class CreateOrderAPIView(APIView):
     def post(self, request, *args, **kwargs):
+        print(request.data)
         property_id = self.kwargs.get('propertyId')
         check_in_date_str = self.kwargs.get('checkindate').strip()
         check_out_date_str = self.kwargs.get('checkoutdate').strip()

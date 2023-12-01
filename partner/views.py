@@ -12,6 +12,7 @@ import json
 from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q
 from booking.models import *
+from rest_framework.permissions import IsAuthenticated
 class Addproperty(APIView):
    
     def post(self, request):
@@ -83,16 +84,17 @@ class Addproperty(APIView):
 
 
 class Propertylist(APIView) :
+
     def get(self, request):
 
-
+        print("request.headers=========",request.headers)
 
         if request.method == 'GET':
         
                 data = RoomProperty.objects.all()
                 
                 serializer = PropertySerializer(data, many=True)
-                print("RoomProperty-------------------",data)
+                # print("RoomProperty-------------------",data)
                 # print("ggggggggggggggggggggg",data,'kkkkkkkkkkkkkkkk',serializer.data)
         
                 return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -127,9 +129,12 @@ class Propertyview(RetrieveAPIView):
 
 class PropertyListView(APIView):
     
+    permission_classes=[IsAuthenticated]
+   
     def get(self, request):
-
-        print("hiiiiiiii",request.data)
+        print("request",request.headers)
+        # print("hiiiiiiii",request.data)
+        print("hhhh",request.headers)
 
         if request.method == 'GET':
             
@@ -167,11 +172,14 @@ class Updateproperty(generics.RetrieveUpdateDestroyAPIView):
 
 class Getpropertybylocation(APIView):
     def get(self, request, *args, **kwargs):
+        print("request---------",request.headers)
         maplocation = self.kwargs.get('location', '')
         category = request.query_params.getlist('category', [])
-        amenities = request.query_params.getlist('Amenities', [])
+        amenities = request.query_params.getlist('amenities', [])
         property_type = request.query_params.getlist('Property_Type', [])
-
+        print("category",category)
+        print("amenities",amenities)
+        print("property_type",property_type)
         queryset = RoomProperty.objects.all()
         
 
@@ -179,18 +187,41 @@ class Getpropertybylocation(APIView):
             queryset = queryset.filter(maplocation=maplocation)
 
         if category:
-           
-            category_query = Q()
+            # category_query = Q(category__category__in=category)
+            # queryset = queryset.filter(category_query)
+            category_query=[] 
+            # fitr_obj1=queryset.filter(category__category='4_Star')
+            # print("fitr_obj1111",fitr_obj1)
             for c in category:
-                category_query |= Q(category__category=c)
-            queryset = queryset.filter(category_query)
+                queryset1=queryset.filter(category__category=c)
+                print("queryset",queryset1)
+                for f in queryset1:
+                    category_query.append(f)
+           
+            # print("category_query",category_query)
+            queryset= category_query  
+
 
         if amenities:
-            
-            amenities_query = Q()
+            # amenities_query = Q(amenities__amenities__in=amenities)
+            # queryset = queryset.filter(amenities_query)
+            amenities_query=[] 
+            # fitr_obj1=queryset.filter(category__category='4_Star')
+            # print("fitr_obj1111",fitr_obj1)
             for a in amenities:
-                amenities_query |= Q(amenities__amenities=a)
-            queryset = queryset.filter(amenities_query)
+                queryset1=queryset.filter(amenities__amenities=a)
+                print("queryset",queryset1)
+                for f in queryset1:
+                    amenities_query.append(f)
+           
+            # print("category_query",category_query)
+            queryset= amenities_query  
+
+
+        # if property_type:
+        #     property_type_query = Q(property_type__in=property_type)
+        #     queryset = queryset.filter(property_type_query)
+
 
         if property_type:
            

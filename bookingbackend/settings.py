@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-# from decouple import config
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,20 +25,32 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--ifv7w3*u0#*#tda*plkdqa569rp)5)1(-*z(9d@s_vj9e=7!+'
+SECRET_KEY = os.getenv('SECRET_KEY1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.BasicAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
+
+#     ]
+# }
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+       
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+        'rest_framework.authentication.TokenAuthentication',
+        # other authentication classes...
+    ],
+    # other settings...
 }
-
 # Application definition
 CELERY_BROKER_URL='redis://127.0.0.1:6379' 
 CELERY_ACCEPT_CONTENT=['application/json']
@@ -83,6 +95,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
       "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
+    
+   
 ]
 
 ROOT_URLCONF = 'bookingbackend.urls'
@@ -112,8 +126,11 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }
 CORS_ALLOW_METHODS = [
     "GET",
@@ -127,8 +144,8 @@ from datetime import timedelta
 ...
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=6),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
+    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=4),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
@@ -174,7 +191,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'booking',
         'USER': 'postgres',
-        'PASSWORD': 'Favas@9142',
+        'PASSWORD': os.getenv('PASSWORD1'),
         'HOST': '',  
         'PORT': '5432', 
     }
@@ -227,19 +244,19 @@ AUTH_USER_MODEL='accounts.CustomUser'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'favas.fav@gmail.com'
-EMAIL_HOST_PASSWORD = "pvatqhdlycvnqfbh"
+EMAIL_HOST_USER =os.getenv('EMAIL_HOST_USER1')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD1')
 
 
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
+DEFAULT_FILE_STORAGE =os.getenv('DEFAULT_FILE_STORAGE1') 
 
-AWS_S3_ACCESS_KEY_ID = 'AKIARPGBAO3WNMLBOEPG'
-AWS_S3_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'lodgifyproject'
+AWS_S3_ACCESS_KEY_ID = os.getenv('AWS_S3_ACCESS_KEY_ID1')
+AWS_S3_SECRET_ACCESS_KEY = os.getenv('AWS_S3_SECRET_ACCESS_KEY1')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME1')
 AWS_QUERYSTRING_AUTH = False
 RAZORPAY_KEY_ID=os.environ.get('RAZORPAY_KEY_ID')
 RAZORPAY_SECRET_KEY=os.environ.get('RAZORPAY_SECRET_KEY')

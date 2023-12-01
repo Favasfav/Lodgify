@@ -46,8 +46,8 @@ class RoomPhoto(models.Model):
 class RoomCategory(models.Model):
     CATEGORY_CHOICES = [
         ('1_star', '1 Star'),
-        ('3_stars', '3 Stars'),
-        ('4_stars', '4 Stars'),
+        ('3_star', '3 Stars'),
+        ('4_star', '4 Stars'),
         ('deluxe_premium_luxury', 'Deluxe/Premium/Luxury'),
     ]
 

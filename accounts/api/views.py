@@ -10,11 +10,92 @@ from rest_framework import status
 from accounts.models import UserProfile,PartnerProfile,CustomUser,Wallet
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework.decorators import permission_classes
+from accounts.permissions import *
+# import datetime
+from django.contrib.auth import get_user_model
+import jwt
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
+from jwt import ExpiredSignatureError, InvalidTokenError
 
 
 
 
-import datetime
+
+
+# class RefreshTokenView(APIView):
+#     def post(self, request):
+#         try:
+#             refresh_token = request.data.get("refresh", None)
+#             refresh = RefreshToken(refresh_token)
+#             print("Token Payload:", refresh.payload)
+#         except ExpiredSignatureError as e:
+#             print("ExpiredSignatureError:", e)
+#             return Response(
+#                 {"error": "Refresh token has expired."},
+#                 status=status.HTTP_401_UNAUTHORIZED,
+#             )
+#         except InvalidTokenError as e:
+#             print("InvalidTokenError:", e)
+#             return Response(
+#                 {"error": "Invalid refresh token."},
+#                 status=status.HTTP_401_UNAUTHORIZED,
+#             )
+#         except Exception as e:
+#             print("Error creating refresh token:", e)
+#             return Response(
+#                 {"error": f"Error creating refresh token: {e}"},
+#                 status=status.HTTP_401_UNAUTHORIZED,
+#             )
+
+#         try:
+#             if not refresh_token:
+#                 return Response(
+#                     {"error": "No valid refresh token provided."},
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+
+#             # Decode the refresh token
+#             decoded_payload = jwt.decode(
+#                 jwt=refresh_token, key=settings.SECRET_KEY, algorithms=["HS256"]
+#             )
+#             print("Decoded Payload:", decoded_payload)
+
+#             # Get the user_id from the decoded payload
+#             user_id = decoded_payload.get("user_id")
+
+#             # Get the user from the Django model using the user_id
+#             user = get_user_model().objects.get(id=user_id)
+
+#             # Create a new refresh token for the user
+#             new_refresh = RefreshToken.for_user(user)
+#             new_refresh["role"] = user.role
+#             new_refresh["email"] = user.email
+#             new_refresh["first_name"] = user.first_name
+#             new_refresh["last_name"] = user.last_name
+
+#             data = {
+#                 "refresh": str(new_refresh),
+#                 "access": str(new_refresh.access_token),
+#             }
+
+#             return Response(data, status=status.HTTP_200_OK)
+
+#         except get_user_model().DoesNotExist:
+#             return Response(
+#                 {"error": "User associated with the refresh token does not exist."},
+#                 status=status.HTTP_404_NOT_FOUND,
+#             )
+#         except Exception as e:
+#             return Response(
+#                 {"error": f"Error: {e}"},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
 class UserLoginView(APIView):
     def post(self, request):
         print("hi----------------")
@@ -22,6 +103,7 @@ class UserLoginView(APIView):
             data = request.data
             serializer = LoginSerializer(data=data)
             if serializer.is_valid():
+                print("hkk")
                 email = 'user-' + serializer.data['email']  # Prefix with 'user-'
                 password = serializer.data['password']
                 print("email",email)
@@ -211,18 +293,30 @@ class PartnerSignupAPI(APIView):
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])        
-def userlist(request):
-    if request.method == 'GET':
+# @api_view(['GET'])  
+ 
+   
+# def userlist(request):
+
+#     if request.method == 'GET':
         
-        data = UserProfile.objects.all()
+#         data = UserProfile.objects.all() 
+        
+#         serializer = UserModelSerializer(data, many=True)
+       
+        
+#         return Response(serializer.data,status=status.HTTP_200_OK)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+class Userlist(APIView):
+    def get(self,request,*args, **kwargs):
+        print("request---------",request.headers)
+        data = UserProfile.objects.all() 
         
         serializer = UserModelSerializer(data, many=True)
-        # print("ggggggggggggggggggggg",data,'kkkkkkkkkkkkkkkk',serializer.data)
+        if serializer:
         
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
+             return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 @api_view(['GET'])        
 def userblock(request,user_id):
@@ -241,7 +335,8 @@ def userblock(request,user_id):
 
 @api_view(['POST'])
 def profileupdate(request, user_id):
-    print("request.data",request.data)
+
+    print("request.data-------------------",request.data)
     try:
         user_profile = CustomUser.objects.get(id=user_id)
         
@@ -274,7 +369,10 @@ def profileupdate(request, user_id):
 
 @api_view(['GET'])        
 def userprofile(request, user_id):
-    print("id", user_id)
+    all_headers = request.META
+    print("All Headers:", all_headers)
+
+    print("id", request.user)
     if request.method == 'GET':
         
             user = CustomUser.objects.get(id=user_id)
@@ -308,6 +406,7 @@ def Partnerprofile(request, user_id):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class Walletmoney(APIView):
     def get(self,request,*args,**kwargs):
+        
         user_id=self.kwargs.get('user_id')
         user = CustomUser.objects.get(id=user_id)
         user_profile=UserProfile.objects.get(user=user)
