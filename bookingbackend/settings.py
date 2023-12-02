@@ -121,9 +121,7 @@ TEMPLATES = [
 ASGI_APPLICATION = 'bookingbackend.asgi.application'
 
 
-CORS_ALLOWED_ORIGINS = [
-    "*",  # Allow requests from any origin
-]
+CORS_ALLOW_ALL_ORIGINS = True
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
