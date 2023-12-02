@@ -344,7 +344,7 @@ def userblock(request,user_id):
         user_profile.save()      
         print("user_profile.is_blocked------------------->",user_profile.is_blocked)    
         return Response({'message':'Account Modified successfully.'},status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+    return Response(status=status.HTTP_400_BAD_REQUEST)  
 
 
 @api_view(['POST'])

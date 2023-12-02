@@ -99,7 +99,7 @@ class Bookinglistlatest(APIView):
             data=serializer.data
             print("hlllllllll",data)
             return Response(data,status=status.HTTP_200_OK)
-        return Response(status=HTTP_400_BAD_REQUEST)    
+        return Response(status=status.HTTP_400_BAD_REQUEST)    
 
 permission_classes=[IsAuthenticated,Userpermission]       
 class CancelOrder(APIView):
