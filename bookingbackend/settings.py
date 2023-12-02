@@ -130,14 +130,14 @@ CHANNEL_LAYERS = {
         },
     },
 }
-CORS_ALLOW_METHODS = [
-    "GET",
-    "POST",
-    "OPTIONS",
-    "DELETE",
-    "PUT",
-    "PATCH",   # Add any other methods you need
-]
+# CORS_ALLOW_METHODS = [
+#     "GET",
+#     "POST",
+#     "OPTIONS",
+#     "DELETE",
+#     "PUT",
+#     "PATCH",   # Add any other methods you need
+# ]
 from datetime import timedelta
 ...
 
