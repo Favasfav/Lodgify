@@ -134,11 +134,12 @@ class UserLoginView(APIView):
                 print("Serialized Data:", data)
                 return Response(data, status=status.HTTP_200_OK)
             
-            return Response({
-                'status': 400,
-                'message': 'something went wrong',
-                'data': serializer.errors
-            })
+            else:
+                return Response({
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    'message': 'Invalid data provided.',
+                    'errors': serializer.errors
+                })
 
         except Exception as e:
             print(e)
@@ -187,6 +188,10 @@ class PartnerLoginView(APIView):
 
         except Exception as e:
             print(e)
+            return Response({
+                'status': 500,
+                'message': 'Internal Server Error',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class AdminLoginView(APIView):
     def post(self, request):
@@ -227,6 +232,10 @@ class AdminLoginView(APIView):
 
         except Exception as e:
             print(e)
+            return Response({
+                'status': 500,
+                'message': 'Internal Server Error',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
  
 @api_view(['GET'])
@@ -244,28 +253,33 @@ def getRoutes(request):
 
 class UserSignupAPI(APIView):
     def post(self,request):
-        print(request.data,"fffffffffffffffffffffff")
-        serializer = SignupSerializer(data=request.data)
-        if serializer.is_valid():
-            user_data = serializer.validated_data
-           
-            print(user_data,"ser_data")
-            user = CustomUser(
-                email = 'user-' + user_data['email'],
-                
-                role = 'user',
-                phone_no = 'user-' + user_data['phone_no'],
-                username = user_data['username'],
-            )
+        try:
+            serializer = SignupSerializer(data=request.data)
+            if serializer.is_valid():
+                user_data = serializer.validated_data
+            
+                print(user_data,"ser_data")
+                user = CustomUser(
+                    email = 'user-' + user_data['email'],
+                    
+                    role = 'user',
+                    phone_no = 'user-' + user_data['phone_no'],
+                    username = user_data['username'],
+                )
 
-            user.set_password(user_data['password'] )
-            user.save()
+                user.set_password(user_data['password'] )
+                user.save()
 
-            UserProfile.objects.create(user=user)
-            return Response({'message':'Account created successfully.'},status=status.HTTP_201_CREATED)
-        print(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+                UserProfile.objects.create(user=user)
+                return Response({'message':'Account created successfully.'},status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            return Response({
+                'status': 500, 
+                'message': 'Internal Server Error',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
          

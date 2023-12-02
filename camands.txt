@@ -1,0 +1,10 @@
+# Run Celery worker in Windows
+celery -A bookingbackend worker --pool=solo -l info
+celery -A bookingbackend worker --pool=solo -l info
+
+
+# Run Celery worker
+celery -A bookingbackend worker -l info
+
+# Run Celery beat (scheduler)
+celery -A bookingbackend beat -l info

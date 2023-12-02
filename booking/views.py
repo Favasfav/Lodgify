@@ -166,14 +166,15 @@ class GetpartnerRevenue(APIView):
         
         # Access the specific field from the aggregation result
         partner_revenue_sum = partner_revenue.get('partner_share__sum', 0)
-        print(partner_revenue_sum, "ppppppp--------ppppppppp")
+       
         if partner_revenue_sum:
             # You can use partner_revenue_sum in your code as needed
             # For example, you can include it in the response data
             response_data =  partner_revenue_sum
             return Response(response_data, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            response_data=0
+            return Response(response_data, status=status.HTTP_200_OK)
       
 class Bookinglatest(APIView):
     def get(self,request, *args, **kwargs):
@@ -186,14 +187,21 @@ class Bookinglatest(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)  
 
 class Bookingtotalno(APIView):
-    def get(self,request, *args, **kwargs):
-        booking_no=len(Booking.objects.all())
-        
-        print("booking_nooo",booking_no)
-        
-        if booking_no:
-            return Response(booking_no,status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)        
+    def get(self, request, *args, **kwargs):
+        try:
+            booking_no = Booking.objects.all().count()
+            
+            print("booking_nooo", booking_no)
+            
+            if booking_no:
+                return Response(booking_no, status=status.HTTP_200_OK)
+            else:
+                booking_no=0
+                return Response(booking_no, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
 
 
 

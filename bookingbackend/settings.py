@@ -77,7 +77,7 @@ INSTALLED_APPS = [
      'rest_framework_simplejwt.token_blacklist',
      'partner',
      'booking',
-     'chat',
+     
      'channels',
      'chats',
      'celery',
