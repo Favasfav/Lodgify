@@ -122,7 +122,7 @@ ASGI_APPLICATION = 'bookingbackend.asgi.application'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # The domain of your frontend application
+    "*",  # Allow requests from any origin
 ]
 CHANNEL_LAYERS = {
     "default": {
