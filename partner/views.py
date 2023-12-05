@@ -129,7 +129,7 @@ class Propertyview(RetrieveAPIView):
 
 class PropertyListView(APIView):
     
-    permission_classes=[IsAuthenticated]
+    
    
     def get(self, request):
         print("request",request.headers)
@@ -147,7 +147,7 @@ class PropertyListView(APIView):
                 return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 class PartnerProperty(APIView):
-    
+    permission_classes=[IsAuthenticated]
     def get(self, request, partner_id):
         print("hiii",partner_id)
        

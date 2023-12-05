@@ -150,6 +150,7 @@ class UserLoginView(APIView):
 
 class PartnerLoginView(APIView):
     def post(self, request):
+        print("request",request.data)
         try:
             data = request.data
             serializer = LoginSerializer(data=data)
@@ -157,6 +158,7 @@ class PartnerLoginView(APIView):
             if serializer.is_valid():
                 email = 'partner-' + serializer.data['email']  # Prefix with 'partner-'
                 password = serializer.data['password']
+                print("email",email)
                 
                 user = authenticate(email=email, password=password)
                 print("user===============================",user)
@@ -253,6 +255,7 @@ def getRoutes(request):
 
 class UserSignupAPI(APIView):
     def post(self,request):
+        print("request.data",request.data)
         try:
             serializer = SignupSerializer(data=request.data)
             if serializer.is_valid():
@@ -275,11 +278,11 @@ class UserSignupAPI(APIView):
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(e)
+            print("mmmmmmmmmmmm",e)
             return Response({
-                'status': 500, 
-                'message': 'Internal Server Error',
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                 
+                'message': e,
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
          
