@@ -26,7 +26,7 @@ def test(request,user_id,checkoutdate):
             date_object = datetime.combine(checkoutdate_str, datetime.min.time())
             print("date_object",date_object)
             current_datetime = datetime.now()
-            sendmail_func.apply_async(args=[user_email],eta=current_datetime )  # date_object or 
-            countdown=20 #we can make for check out date email send for asking review
+            sendmail_func.apply_async(args=[user_email],countdown=20 )  # date_object or eta=current_datetime
+             #we can make for check out date email send for asking review
 
             # return HttpResponse("Done")
