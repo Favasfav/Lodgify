@@ -231,4 +231,24 @@ class Blockproperty(APIView):
             return Response(status.HTTP_400_BAD_REQUEST)    
         except:
             return Response(status.HTTP_400_BAD_REQUEST)
+        
+class Bookingreport(APIView):
+            def get(self,request):
+                try:
+                    
+                        cancelled_obj_count=Booking.objects.filter(is_cancelled=True).count()
+                        confirem_obj_count=Booking.objects.all().count()-cancelled_obj_count
+                        data={
+                           cancelled_obj_count:cancelled_obj_count,
+                           confirem_obj_count:confirem_obj_count
 
+                        }
+                        return Response(data,status=status.HTTP_200_OK)
+                    # return Response(data={cancelled_obj_count:0,confirem_obj_count:0},status=status.HTTP_200_OK)
+                except Exception as e:
+                    print(e)
+                    return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+
+
+
+        

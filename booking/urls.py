@@ -14,4 +14,5 @@ path('bookinglist/<int:user_id>/', Bookinglist.as_view(), name='bookinglist'),
    path('gettotalnobooking/<int:user_id>/', Bookingtotalno.as_view(), name='gettotalnobooking'),
    path('blockproperty/<int:property_id>/', Blockproperty.as_view(), name='gettotalnobooking'),
    path('latestsale/',Bookinglistlatest.as_view(),name='latestsale'),
+   path('salesreport/',Bookingreport.as_view(),name='latestsale'),
 ]
