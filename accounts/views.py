@@ -29,4 +29,4 @@ def test(request,user_id,checkoutdate):
             sendmail_func.apply_async(args=[user_email],eta=current_datetime )  # date_object or 
             countdown=20 #we can make for check out date email send for asking review
 
-            return HttpResponse("Done")
+            # return HttpResponse("Done")

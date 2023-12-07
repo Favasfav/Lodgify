@@ -15,7 +15,7 @@ def sendmail_func(user_email):
         "Your email body goes here",  # Add your email body/message
         settings.DEFAULT_FROM_EMAIL,
         [user_email],  # Add the recipient list as a list
-        fail_silently=False
+        fail_silently=True
     )
     
     return 'Done'

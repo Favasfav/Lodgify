@@ -13,6 +13,7 @@ from rest_framework.generics import RetrieveAPIView
 from django.db.models import Q
 from booking.models import *
 from rest_framework.permissions import IsAuthenticated
+
 class Addproperty(APIView):
    
     def post(self, request):
