@@ -239,8 +239,8 @@ class Bookingreport(APIView):
                         cancelled_obj_count=Booking.objects.filter(is_cancelled=True).count()
                         confirem_obj_count=Booking.objects.all().count()-cancelled_obj_count
                         data={
-                           cancelled_obj_count:cancelled_obj_count,
-                           confirem_obj_count:confirem_obj_count
+                           "cancelled_obj_count":cancelled_obj_count,
+                           "confirem_obj_count":confirem_obj_count
 
                         }
                         return Response(data,status=status.HTTP_200_OK)
