@@ -113,12 +113,17 @@ class CancelOrder(APIView):
 
        
         wallet, created = Wallet.objects.get_or_create(user=booking.user)
-
-        
         wallet.balance += booking.total_amount
         print(wallet.balance, "ggggggggggg")
         wallet.save()
         booking.is_cancelled=True
+        transaction=Transcation.objects.get(booking=booking)
+        transaction.partner_share=transaction.partner_share-int(booking.total_amount*0.7)
+        
+        transaction.company_share=transaction.company_share-int(booking.total_amount*0.3)
+        print("transaction.company_share",transaction.company_share)
+        transaction.save()
+        print("transaction",transaction)
         booking.save()
         return Response({'message': 'Order canceled successfully.'}, status=status.HTTP_200_OK)
 
