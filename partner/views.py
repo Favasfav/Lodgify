@@ -95,8 +95,7 @@ class Propertylist(APIView) :
                 data = RoomProperty.objects.all()
                 
                 serializer = PropertySerializer(data, many=True)
-                # print("RoomProperty-------------------",data)
-                # print("ggggggggggggggggggggg",data,'kkkkkkkkkkkkkkkk',serializer.data)
+                
         
                 return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -188,40 +187,34 @@ class Getpropertybylocation(APIView):
             queryset = queryset.filter(maplocation=maplocation)
 
         if category:
-            # category_query = Q(category__category__in=category)
-            # queryset = queryset.filter(category_query)
+            
             category_query=[] 
-            # fitr_obj1=queryset.filter(category__category='4_Star')
-            # print("fitr_obj1111",fitr_obj1)
+           
             for c in category:
                 queryset1=queryset.filter(category__category=c)
-                print("queryset",queryset1)
+                
                 for f in queryset1:
                     category_query.append(f)
            
-            # print("category_query",category_query)
+            
             queryset= category_query  
 
 
         if amenities:
-            # amenities_query = Q(amenities__amenities__in=amenities)
-            # queryset = queryset.filter(amenities_query)
+            
             amenities_query=[] 
-            # fitr_obj1=queryset.filter(category__category='4_Star')
-            # print("fitr_obj1111",fitr_obj1)
+           
             for a in amenities:
                 queryset1=queryset.filter(amenities__amenities=a)
                 print("queryset",queryset1)
                 for f in queryset1:
                     amenities_query.append(f)
            
-            # print("category_query",category_query)
+           
             queryset= amenities_query  
 
 
-        # if property_type:
-        #     property_type_query = Q(property_type__in=property_type)
-        #     queryset = queryset.filter(property_type_query)
+       
 
 
         if property_type:
@@ -230,7 +223,7 @@ class Getpropertybylocation(APIView):
             for p in property_type:
                 property_type_query |= Q(property_type=p)
             queryset = queryset.filter(property_type_query)
-        print("ffffffffffff",queryset)
+        
         serializer = PropertySerializer(queryset, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -239,8 +232,3 @@ class Getpropertybylocation(APIView):
 
 
 
-
-    # room = models.ForeignKey(RoomProperty,related_name='room_bookings', on_delete=models.CASCADE)
-    # user = models.ForeignKey(UserProfile,related_name='user_bookings',on_delete=models.CASCADE)
-    # check_in_date = models.DateField()
-    # check_out_date = models.DateField()

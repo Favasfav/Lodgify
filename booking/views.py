@@ -158,12 +158,14 @@ class Totalrevenue(APIView):
 
 class GetpartnerRevenue(APIView):
     def get(self, request, *args, **kwargs):
-        partner_id = self.kwargs.get('partner_id')
-        
-        # Use get_object_or_404 to handle the case where PartnerProfile is not found
-        partner_obj = get_object_or_404(PartnerProfile, id=partner_id)
-        
+        user_id = self.kwargs.get('partner_id')
+        user_obj=CustomUser.objects.get(id=user_id)
+        partner_obj=PartnerProfile.objects.get(user=user_obj)
+       
+       
+        print(partner_obj,"fff")
         transaction_obj = Transcation.objects.filter(partner=partner_obj)
+        print("transaction_obj",transaction_obj)
         
         partner_revenue = transaction_obj.aggregate(Sum("partner_share", default=0))
         
@@ -190,6 +192,16 @@ class Bookinglatest(APIView):
         if serializer:
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)  
+    
+class BookingTotalpartner(APIView):
+    def get(self,request, *args, **kwargs):
+        booking=Booking.objects.all().order_by('-id')
+        data=booking
+        print("booking",booking)
+        serializer=BookingSerializer(instance=booking,many=True)
+        if serializer:
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)      
 
 class Bookingtotalno(APIView):
     def get(self, request, *args, **kwargs):
