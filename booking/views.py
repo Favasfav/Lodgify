@@ -89,17 +89,23 @@ class Bookinglist(APIView):
 
 
 
-class Bookinglistlatest(APIView):
-    def get(self,request):
-        
-        bookings=Booking.objects.all().order_by('-id')[:5]
-        print("bookings",bookings)
-        serializer=BookingSerializer(instance=bookings,many=True)   
-        if serializer:
-            data=serializer.data
-            print("hlllllllll",data)
-            return Response(data,status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)    
+class Bookinglistlatestadmin(APIView):
+    def get(self, request):
+        try:
+            bookings = Booking.objects.all().order_by('-id')[:5]
+            print("bookings", bookings)
+            serializer = BookingSerializer(instance=bookings, many=True)
+
+            if serializer:
+                data = serializer.data
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                return Response([], status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+   
 
 permission_classes=[IsAuthenticated,Userpermission]       
 class CancelOrder(APIView):
@@ -194,29 +200,62 @@ class Bookinglatest(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)  
     
 class BookingTotalpartner(APIView):
-    def get(self,request, *args, **kwargs):
-        booking=Booking.objects.all().order_by('-id')
-        data=booking
-        print("booking",booking)
-        serializer=BookingSerializer(instance=booking,many=True)
-        if serializer:
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)      
-
-class Bookingtotalno(APIView):
     def get(self, request, *args, **kwargs):
+        user_id = self.kwargs.get("user_id")
+        user = CustomUser.objects.get(id=user_id)
+
         try:
-            booking_no = Booking.objects.all().count()
-            
-            print("booking_nooo", booking_no)
-            
-            if booking_no:
-                return Response(booking_no, status=status.HTTP_200_OK)
-            else:
-                booking_no=0
-                return Response(booking_no, status=status.HTTP_200_OK)
+            partner = PartnerProfile.objects.get(user=user)
+            rooms = RoomProperty.objects.filter(partner=partner)
+
+            if rooms:
+                booking_no = Booking.objects.filter(room__in=rooms)
+                print("booking_no", booking_no)
+                serializer=BookingSerializer(instance=booking_no,many=True)
+
+                if serializer:
+                    data=serializer.data
+                    return Response(data, status=status.HTTP_200_OK)
+                    
+                else:
+                   
+                    return Response([], status=status.HTTP_200_OK)
 
         except Exception as e:
+            print(e)
+            return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    
+
+class Bookingtotalnopartner(APIView):
+    def get(self, request, *args, **kwargs):
+        
+        user_id=self.kwargs.get("user_id") 
+        user=CustomUser.objects.get(id=user_id)
+        print("user",user)
+        try:
+            
+            partner=PartnerProfile.objects.get(user=user)
+           
+            rooms=RoomProperty.objects.filter(partner=partner)
+            
+            booking_no=0
+            if rooms:
+                print("ggggg0000000")
+                try:
+                    booking_no = Booking.objects.filter(room__in=rooms).count()
+                    
+                    print("booking_nooo", booking_no)
+                
+                    if booking_no:
+                        return Response(booking_no, status=status.HTTP_200_OK)
+                    
+                        
+                except:
+                        booking_no=0
+                        return Response(booking_no, status=status.HTTP_200_OK)
+
+        except Exception as e: 
             print(e)
             return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
 
@@ -267,5 +306,39 @@ class Bookingreport(APIView):
                     return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
 
 
+class Bookinglatestpartner(APIView):
+    def get(self, request, *args, **kwargs):
+        
+        user_id=self.kwargs.get("user_id") 
+        user=CustomUser.objects.get(id=user_id)
+        print("user",user)
+        try:
+            
+            partner=PartnerProfile.objects.get(user=user)
+           
+            rooms=RoomProperty.objects.filter(partner=partner)
+            
+            print("rooms",rooms)
+            if rooms:
+                print("ggggg")
+                try:
+                        booking = Booking.objects.filter(room__in=rooms)[:5]
+                        serializer=BookingSerializer(instance=booking,many=True)
+                        if serializer:
+                            data=serializer.data
+                            return Response(data, status=status.HTTP_200_OK)
+                        
+                            
+                except:  
+                          booking=0
+                          return Response([], status=status.HTTP_200_OK)      
+                
+                
+            else:
+                booking=0
+                return Response(booking, status=status.HTTP_200_OK)
 
+        except Exception as e:  
+            print(e)
+            return Response({'message': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
         
