@@ -35,16 +35,17 @@ class Checkroomavailblity(APIView):
                 overlapping_bookings = Booking.objects.filter(
                     room=property,
                     check_in_date__lt=check_out_date,
-                    check_out_date__gt=check_in_date
-                )
-
+                    check_out_date__gt=check_in_date,
+                    is_cancelled=False,
+                ) 
+                print("overlaped",overlapping_bookings)
                 block_obj = Blockbooking.objects.filter(property=property)
                 print("block_obj", block_obj)
                 if block_obj:
                     for i in block_obj:
                        print(i.end_date,i.starting_date) 
                        if  i.end_date>=check_in_date and check_out_date >=i.starting_date:
-                        return Response({"message": "Required quantity of rooms not available now"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"message": "Required quantity of rooms not available for current Time"}, status=status.HTTP_400_BAD_REQUEST)
 
                 
                 total_rooms_available = property.total_rooms
@@ -181,8 +182,7 @@ class GetpartnerRevenue(APIView):
         partner_revenue_sum = partner_revenue.get('partner_share__sum', 0)
        
         if partner_revenue_sum:
-            # You can use partner_revenue_sum in your code as needed
-            # For example, you can include it in the response data
+            
             response_data =  partner_revenue_sum
             return Response(response_data, status=status.HTTP_200_OK)
         else:

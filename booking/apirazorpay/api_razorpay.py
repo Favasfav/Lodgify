@@ -10,103 +10,114 @@ rz_client=RazorpayClient()
 from datetime import datetime
 class CreateOrderAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        print(request.data)
-        property_id = self.kwargs.get('propertyId')
-        check_in_date_str = self.kwargs.get('checkindate').strip()
-        check_out_date_str = self.kwargs.get('checkoutdate').strip()
-        room_qty = self.kwargs.get('roomqty')
-        user_id = self.kwargs.get('user_id')
-
-        print("hhhhhhhhhh", request.data)
-
-        property = RoomProperty.objects.get(id=property_id)
-        customuser_obj = CustomUser.objects.get(id=user_id)
-        user = UserProfile.objects.get(user=customuser_obj)
-
-        print("property", property)
-        print("dataaaaaa------------------", property_id, check_out_date_str, check_in_date_str, room_qty)
-        block_obj = Blockbooking.objects.filter(property=property)
-        print("block_obj", block_obj)
-        if block_obj:
-            for i in block_obj:
-                print(i.end_date, i.starting_date)
-                # Convert strings to datetime.date
-
-
-                check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d').date()
-                check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d').date()
-                if i.end_date >= check_in_date and check_out_date >= i.starting_date:
-                    return Response({"message": "Required quantity of rooms not available now"},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
         try:
-           
+            
+            property_id = self.kwargs.get('propertyId')
+            check_in_date_str = self.kwargs.get('checkindate').strip()
+            check_out_date_str = self.kwargs.get('checkoutdate').strip()
+            room_qty = self.kwargs.get('roomqty')
+            user_id = self.kwargs.get('user_id')
+
+            property = RoomProperty.objects.get(id=property_id)
+            customuser_obj = CustomUser.objects.get(id=user_id)
+            user = UserProfile.objects.get(user=customuser_obj)
+            
+            block_obj = Blockbooking.objects.filter(property=property)
+
+            if block_obj:
+                for i in block_obj:
+                    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d').date()
+                    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d').date()
+                    if i.end_date >= check_in_date and check_out_date >= i.starting_date:
+                        return Response({"message": "Required quantity of rooms not available for the dates"},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
             if property and check_out_date_str and check_in_date_str and room_qty:
-
-
-                # Convert strings to datetime.date
-
-
                 check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d').date()
                 check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d').date()
-                
-
+                print("hiii",property)
                 overlapping_bookings = Booking.objects.filter(
-                    room=property, 
+                    room=property,
                     check_in_date__lt=check_out_date,
-                    check_out_date__gt=check_in_date
+                    check_out_date__gt=check_in_date,
+                    is_cancelled=False,
+                    
                 )
-                print("jjj",overlapping_bookings)
-                print("overlapping_bookings", overlapping_bookings)
-                total_rooms_available = property.total_rooms
-                total_rooms_booked = sum(booking.room_qty_booked for booking in overlapping_bookings)
-                print("total_rooms_booked",total_rooms_booked)
-                remaining_rooms = total_rooms_available - total_rooms_booked
-                print("hhh", remaining_rooms)
-                if remaining_rooms < int(room_qty):
-                    return Response({"message": "Required quantity of rooms not available now"},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                print("hiii",property,overlapping_bookings)
+                if overlapping_bookings:
+                    total_rooms_available = property.total_rooms
+                    total_rooms_booked = sum(booking.room_qty_booked for booking in overlapping_bookings)
+                    remaining_rooms = total_rooms_available - total_rooms_booked
+
+                    if remaining_rooms < int(room_qty):
+                        return Response({"message": "Required quantity of rooms not available for the date "},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        create_order_serializer = CreateOrderSerializer(data=request.data)
+
+                        if create_order_serializer.is_valid():
+                            amount = create_order_serializer.validated_data.get("amount")
+                            currency = create_order_serializer.validated_data.get("currency")
+
+                            order_response = rz_client.create_order(
+                                    amount=amount,
+                                    currency=currency
+                                )
+                            print("order_response===============>",order_response)
+                        
+                            response = {
+                                "status_code": status.HTTP_201_CREATED,
+                                "message": "order_created",
+                                "data": order_response
+                            }
+                        else:
+                            response = {
+                                "status_code": status.HTTP_400_BAD_REQUEST,
+                                "message": "bad request",
+                                "error": create_order_serializer.errors
+                            }
 
                 else:
-                    create_order_serializer = CreateOrderSerializer(
-                        data=request.data
-                    )
-                    print(request.data, "hhhjh")
+                    create_order_serializer = CreateOrderSerializer(data=request.data)
 
                     if create_order_serializer.is_valid():
-                        print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
-                        amount = (create_order_serializer.validated_data.get("amount"))
+                        amount = create_order_serializer.validated_data.get("amount")
                         currency = create_order_serializer.validated_data.get("currency")
-                        print("jjhjj", currency, amount)
-                        # serializer=AmountSerializer(data=)
+                        print("amount",amount,currency)
                         order_response = rz_client.create_order(
                             amount=amount,
                             currency=currency
                         )
-                        print(order_response, "order_response")
+                        print("order_response========================>>>",order_response)
+                        # if 'order_id' not in order_response or 'payment_id' not in order_response:
+                        #      return Response({"message": "Invalid response from Razorpay API"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                         
+            
                         response = {
                             "status_code": status.HTTP_201_CREATED,
                             "message": "order_created",
                             "data": order_response
                         }
-                       
-                    else:
+                        
+                    if not create_order_serializer.is_valid():
+                        print("Validation Errors:", create_order_serializer.errors)
                         response = {
                             "status_code": status.HTTP_400_BAD_REQUEST,
                             "message": "bad request",
                             "error": create_order_serializer.errors
                         }
+                        return Response(response)
 
-                    return Response(response)
-        except:
+
+                return Response(response)
+
+        except Exception as e:
             response = {
                 "status_code": status.HTTP_400_BAD_REQUEST,
                 "message": "bad request",
-                "error": TranscationModelSerializer.errors
+                "error": str(e)
             }
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
   
 
 class TranscationAPIView(APIView):
@@ -128,26 +139,22 @@ class TranscationAPIView(APIView):
         no_ofdays=int(checkout[2])-int(checkin[2])+1
         print("no_ofdays",no_ofdays)
         data=request.data
-        print("data",data)
+        print("dataTranscationAPIView",data)
         razorpay_order_id=data.get("order_id")
         razorpay_payment_id=data.get("payment_id")
         razorpay_signature=data.get("signature")
         # razorpay_amount=data.get("amount")
-        data={"order_id":razorpay_order_id,
+        data={
+             "order_id":razorpay_order_id,
             "payment_id":razorpay_payment_id,
             "signature":razorpay_signature,
              "user":user,
             # "partner":property.partner,
             }
         serializer=TransactioncharcheckSerializer(data=data)
-            
-
-
-
-
         
         if serializer.is_valid():
-            print("data===================")
+            print("data===================",razorpay_order_id,razorpay_payment_id,razorpay_signature)
             is_status= rz_client.verify_payment(
             razorpay_order_id,
             razorpay_payment_id,

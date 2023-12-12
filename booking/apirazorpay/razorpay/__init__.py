@@ -1,5 +1,7 @@
-import razorpay
+# import razorpay
 from django.conf import settings
-client = razorpay.Client(auth=("rzp_test_GlidMFhzhQAugp", "cVJgnrW2HlTuFN9lvJzWpJWh"))
+import os
+import razorpay
+# client = razorpay.Client(auth=("rzp_test_5xVEgUg2MnBlyx","WQx9vzmp4XoZDMgX5Cw6pRLS"))
 
-# client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
+client = razorpay.Client(auth=(os.getenv('RAZORPAY_KEY_ID1'), os.getenv('RAZORPAY_SECRET_KEY1'))) 

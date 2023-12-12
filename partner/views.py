@@ -181,48 +181,25 @@ class Getpropertybylocation(APIView):
         print("amenities",amenities)
         print("property_type",property_type)
         queryset = RoomProperty.objects.all()
-        
-
         if maplocation:
             queryset = queryset.filter(maplocation=maplocation)
+        # property_type = ['Resort','Hotel']    
+        if property_type: 
+            
+            
+            queryset=queryset.filter(property_type__in=property_type)
+        
 
         if category:
-            
-            category_query=[] 
-           
-            for c in category:
-                queryset1=queryset.filter(category__category=c)
-                
-                for f in queryset1:
-                    category_query.append(f)
-           
-            
-            queryset= category_query  
+            queryset= queryset.filter(category__category__in=category) 
 
 
         if amenities:
             
-            amenities_query=[] 
            
-            for a in amenities:
-                queryset1=queryset.filter(amenities__amenities=a)
-                print("queryset",queryset1)
-                for f in queryset1:
-                    amenities_query.append(f)
-           
-           
-            queryset= amenities_query  
-
-
-       
-
-
-        if property_type:
-           
-            property_type_query = Q()
-            for p in property_type:
-                property_type_query |= Q(property_type=p)
-            queryset = queryset.filter(property_type_query)
+            queryset=queryset.filter(amenities__amenities__in=amenities)
+            print("queryset",queryset)
+        
         
         serializer = PropertySerializer(queryset, many=True)
 
