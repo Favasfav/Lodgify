@@ -14,13 +14,13 @@ class Booking(models.Model):
     total_amount=models.PositiveIntegerField(blank=True,null=True)
     is_cancelled=models.BooleanField(default=False)
     
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=Q(check_in_date__gte=timezone.now()),
-                name="check_in_date must be greater than or equal to today"
-            )
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.CheckConstraint(
+    #             check=Q(check_in_date__gte=timezone.now()),
+    #             name="check_in_date must be greater than or equal to today"
+    #         )
+    #     ]
 
     def __str__(self):
         return f"Booking ID: {self.id}"
