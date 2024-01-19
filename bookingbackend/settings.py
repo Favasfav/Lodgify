@@ -120,7 +120,7 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'bookingbackend.wsgi.application'
 ASGI_APPLICATION = 'bookingbackend.asgi.application'
-
+CSRF_TRUSTED_ORIGINS = ['https://lodgify-roombooking.vercel.app','https://lodgify.boxwatches.shop','http://*.127.0.0.1']
 
 CORS_ALLOW_ALL_ORIGINS = True
 CHANNEL_LAYERS = {
